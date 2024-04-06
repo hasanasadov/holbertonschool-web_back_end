@@ -1,6 +1,5 @@
-
 #!/usr/bin/env python3
-''' Simple pagination '''
+""" Simple pagination """
 import csv
 import math
 from typing import List, Tuple
@@ -26,20 +25,36 @@ class Server:
         return self.__dataset
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
-        ''' def get page '''
-        assert type(page_size) is int and type(page) is int
-        assert page > 0
-        assert page_size > 0
-        self.dataset()
-        i = index_range(page, page_size)
-        if i[0] >= len(self.__dataset):
-            return []
-        else:
-            return self.__dataset[i[0]:i[1]]
+        """
+            Get the page
+
+            Args:
+                page: Current page
+                page_size: Total size of the page
+
+            Return:
+                List of the pagination done
+        """
+        assert isinstance(page, int) and page > 0
+        assert isinstance(page_size, int) and page_size > 0
+
+        range: Tuple = index_range(page, page_size)
+        pagination: List = self.dataset()
+
+        return (pagination[range[0]:range[1]])
 
 
 def index_range(page: int, page_size: int) -> Tuple[int, int]:
-    ''' De*f index range '''
-    index = page * page_size - page_size
-    index_1 = index + page_size
-    return (index, index_1)
+    """
+    Range of the page
+    Args:
+        page: Current page
+        page_size: Total size of the page
+    Return:
+        tuple with the range start and end size page
+    """
+
+    final_size: int = page * page_size
+    start_size: int = final_size - page_size
+
+    return (start_size, final_size)
