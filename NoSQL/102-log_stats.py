@@ -1,34 +1,34 @@
 #!/usr/bin/env python3
-""" Log stats """
+""" MongoDB Operations with Python using pymongo """
 from pymongo import MongoClient
 
-
 if __name__ == "__main__":
+    """ Provides some stats about Nginx logs stored in MongoDB """
     client = MongoClient('mongodb://127.0.0.1:27017')
-    db_nginx = client.logs.nginx
+    nginx_collection = client.logs.nginx
+
+    n_logs = nginx_collection.count_documents({})
+    print(f'{n_logs} logs')
+
     methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-
-    count_logs = db_nginx.count_documents({})
-    print(f'{count_logs} logs')
-
     print('Methods:')
     for method in methods:
-        count_method = db_nginx.count_documents({'method': method})
-        print(f'\tmethod {method}: {count_method}')
+        count = nginx_collection.count_documents({"method": method})
+        print(f'\tmethod {method}: {count}')
 
-    check = db_nginx.count_documents(
+    status_check = nginx_collection.count_documents(
         {"method": "GET", "path": "/status"}
     )
 
-    print(f'{check} status check')
-    print("IPs:")
-    ips = db_nginx.aggregate([
+    print(f'{status_check} status check')
+
+    top_ips = nginx_collection.aggregate([
         {"$group":
             {
                 "_id": "$ip",
                 "count": {"$sum": 1}
             }
-        },
+         },
         {"$sort": {"count": -1}},
         {"$limit": 10},
         {"$project": {
@@ -38,5 +38,8 @@ if __name__ == "__main__":
         }}
     ])
 
-    for ip in ips:
-        print(f"\t{ip.get('ip')}: {ip.get('count')}")
+    print("IPs:")
+    for top_ip in top_ips:
+        ip = top_ip.get("ip")
+        count = top_ip.get("count")
+        print(f'\t{ip}: {count}')
