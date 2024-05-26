@@ -1,3 +1,0 @@
-// Count documents school collection
-db.school.count()
-

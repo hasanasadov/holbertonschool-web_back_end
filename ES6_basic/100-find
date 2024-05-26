@@ -1,3 +1,0 @@
-// Regex Filter
-db.school.find({'name': /^Holberton/})
-
